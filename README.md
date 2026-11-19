@@ -124,13 +124,16 @@ public function listSwitchFindRecord(string $modelClass, $id)
 
 ## Demo
 
-*Default behavior*
+### Default behavior
+
 ![switch](doc/switch.gif)
 
-*Behavior with `icon: false`*
+### Behavior with `icon: false`
+
 ![switch-text](doc/switch-text.gif)
 
-*With custom titles*
+### With custom titles
+
 ![switch-custom-titles](doc/switch-custom-titles.gif)
 
 ## Credits
