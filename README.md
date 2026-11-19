@@ -6,14 +6,15 @@ Clicking the switch inverts a boolean field of the record and refreshes the list
 A standalone replacement for [inetis/listswitch](https://github.com/inetis-ch/oc-ListSwitch-plugin) with:
 
 - a Bootstrap switch instead of ✓/✗ icons (see [Appearance](#appearance));
-- the `invers` option — the switch position can be the opposite of the field value
+- the `inverse` option — the switch position can be the opposite of the field value
   (handy for fields like `is_hidden`: the switch is "on" when the record is visible);
 - signed toggle requests — a backend user cannot invert an arbitrary field of an arbitrary model;
 - a hook to restrict which records can be toggled;
 - support for relation lists inside forms (RelationController).
 
 The column type `inetis-list-switch` and the AJAX handler names are kept, so existing
-`columns.yaml` files work without changes.
+`columns.yaml` files work without changes: by default the switch is "on" when the field is true,
+just like ✓ in the original.
 
 ## Requirements
 
@@ -47,8 +48,8 @@ Disable or remove `Inetis.ListSwitch`. **Do not run both plugins at the same tim
 the same column type, and OctoberCMS uses the plugin that comes first in load order
 (Inetis), so this plugin would be ignored.
 
-Note that the default of `invers` is `true`: columns without an explicit `invers` show the switch
-opposite to the field value. Set `invers: false` where the switch should follow the value.
+Existing columns need no changes: without `inverse` the switch follows the field value
+(on = true), as ✓/✗ did. Add `inverse: true` only where the switch should show the opposite.
 
 ## Usage
 
@@ -59,8 +60,8 @@ is_hidden:
     label: 'Published'
     type: inetis-list-switch
 
-    # Switch position is the opposite of the field value (default: true)
-    invers: true
+    # Switch position is the opposite of the field value (default: false)
+    inverse: true
 
     # Show the Bootstrap switch; false shows Yes/No text instead (default: true)
     icon: true
@@ -77,7 +78,12 @@ is_hidden:
     request: onSwitchInetisListField
 ```
 
-`titleTrue` / `textTrue` are used when the **field value** is true, regardless of `invers`.
+`titleTrue` / `textTrue` are used when the **field value** is true, regardless of `inverse`.
+
+| Field value | `inverse: false` (default) | `inverse: true` |
+|---|---|---|
+| `true`  | on  | off |
+| `false` | off | on  |
 
 The column is made non-clickable automatically, so clicking the switch does not open the record.
 

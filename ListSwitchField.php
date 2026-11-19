@@ -18,7 +18,7 @@ class ListSwitchField
      * @var array<string, mixed> defaultFieldConfig, every option can be overridden by the column config.
      */
     private static array $defaultFieldConfig = [
-        'invers' => true,
+        'inverse' => false,
         'icon' => true,
         'titleTrue' => 'konvertagency.listswitchplus::lang.listswitch.title_true',
         'titleFalse' => 'konvertagency.listswitchplus::lang.listswitch.title_false',
@@ -101,7 +101,7 @@ class ListSwitchField
 
     /**
      * getButtonValue returns button text or the Bootstrap switch.
-     * With invers the switch position is opposite to the field value.
+     * With inverse the switch position is opposite to the field value.
      */
     public function getButtonValue(): string
     {
@@ -109,7 +109,7 @@ class ListSwitchField
             return e(Lang::get($this->getConfig($this->value ? 'textTrue' : 'textFalse')));
         }
 
-        $isChecked = $this->getConfig('invers') ? !$this->value : (bool) $this->value;
+        $isChecked = $this->getConfig('inverse') ? !$this->value : (bool) $this->value;
 
         return '<div class="form-check form-switch"><input class="form-check-input" type="checkbox"'
             . ($isChecked ? ' checked="checked"' : '') . '></div>';
