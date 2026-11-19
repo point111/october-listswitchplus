@@ -1,0 +1,10 @@
+{
+    "name": "konvertagency/listswitchplus-plugin",
+    "type": "october-plugin",
+    "description": "Switch buttons in backend lists that toggle a boolean model field (based on inetis/listswitch, MIT)",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.0",
+        "composer/installers": "^1 || ^2"
+    }
+}
