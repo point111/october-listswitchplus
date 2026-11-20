@@ -76,8 +76,15 @@ class Plugin extends PluginBase
 
     /**
      * processInvertField checks the request signature and inverts the model field.
-     * The record is looked up via the controller's listSwitchFindRecord($modelClass, $id)
-     * when it exists (it throws itself if access is denied), otherwise findOrFail().
+     *
+     * Record lookup has an OPTIONAL extension point: a backend controller may declare
+     * `listSwitchFindRecord(string $modelClass, $id)` (directly or via a trait shared by many
+     * controllers) to decide itself which record may be toggled — e.g. find a soft-deleted
+     * record with withTrashed(), or deny the toggle by throwing an ApplicationException.
+     * Without that method the record is loaded with findOrFail(), exactly like the original
+     * Inetis.ListSwitch, so trashed records are "not found".
+     *
+     * @see README.md, section "Restricting records: listSwitchFindRecord"
      */
     protected function processInvertField(Controller $controller): void
     {
@@ -94,6 +101,7 @@ class Plugin extends PluginBase
             throw new ApplicationException(Lang::get('konvertagency.listswitchplus::lang.error.invalid_signature'));
         }
 
+        // Optional controller hook, see the docblock above; otherwise behave like Inetis.ListSwitch.
         $item = $controller->methodExists('listSwitchFindRecord')
             ? $controller->listSwitchFindRecord($modelClass, $id)
             : $modelClass::findOrFail($id);

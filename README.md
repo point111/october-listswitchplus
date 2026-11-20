@@ -112,8 +112,45 @@ record id and field name cannot be substituted in the request.
 
 ### Restricting records: `listSwitchFindRecord`
 
-By default the record is loaded with `$modelClass::findOrFail($id)`. If the backend controller
-has a `listSwitchFindRecord` method, it is used instead. Throw an exception there to deny the toggle:
+By default the record is loaded with `$modelClass::findOrFail($id)`, like in the original
+ListSwitch. This standard lookup has two blind spots:
+
+- it does not see **soft-deleted records** (models with the `SoftDelete` trait). If your lists
+  show trashed records, clicking their switch fails with "record not found";
+- it knows nothing about **access rights** — every backend user who can open the list can toggle
+  every record in it.
+
+To handle this, declare an optional `listSwitchFindRecord(string $modelClass, $id)` method in the
+backend controller. If it exists, the plugin calls it instead of `findOrFail()` and toggles the
+record it returns. To deny the toggle, throw an `ApplicationException` — its message is shown to
+the user and nothing is saved.
+
+#### Example: soft-deleted records
+
+Find records in the trash too, but let only users with a specific permission toggle them:
+
+```php
+use ApplicationException;
+use October\Rain\Database\Traits\SoftDelete;
+
+public function listSwitchFindRecord(string $modelClass, $id)
+{
+    // Models without SoftDelete have no withTrashed()
+    if (!in_array(SoftDelete::class, class_uses_recursive($modelClass), true)) {
+        return $modelClass::findOrFail($id);
+    }
+
+    $record = $modelClass::withTrashed()->findOrFail($id);
+
+    if ($record->trashed() && !$this->user->hasAccess('acme.blog.manage_trash')) {
+        throw new ApplicationException('Restore the record from the trash before changing it.');
+    }
+
+    return $record;
+}
+```
+
+#### Example: locked records
 
 ```php
 public function listSwitchFindRecord(string $modelClass, $id)
@@ -127,6 +164,28 @@ public function listSwitchFindRecord(string $modelClass, $id)
     return $record;
 }
 ```
+
+#### Sharing the hook between controllers
+
+The method can live in a trait. Every controller that uses the trait gets the same rule:
+
+```php
+trait FindsSwitchRecords
+{
+    public function listSwitchFindRecord(string $modelClass, $id)
+    {
+        // ...
+    }
+}
+
+class Posts extends \Backend\Classes\Controller
+{
+    use FindsSwitchRecords;
+}
+```
+
+The hook is also picked up when it is added to a controller dynamically
+(`Controller::extend()` + `addDynamicMethod()`).
 
 ## Demo
 

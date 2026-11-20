@@ -1,3 +1,4 @@
 v1.0.1: First version of ListSwitchPlus
 v1.0.2: Standalone plugin, no longer requires Inetis.ListSwitch
 v1.0.3: Option "invers" renamed to "inverse", default changed to false
+v1.0.4: Hook listSwitchFindRecord documented
